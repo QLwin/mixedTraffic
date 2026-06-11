@@ -1,0 +1,29 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "Mixed Traffic",
+	"Description": "Physics-accurate mixed traffic simulation (IDM/ACC/MTM) for NPC vehicle AI in UE5. Implements the Mixed Traffic Flow Model (MTM) from Kanagaraj & Treiber (2018).",
+	"Category": "AI",
+	"CreatedBy": "QLwin",
+	"CreatedByURL": "https://github.com/QLwin/mixedTraffic",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": true,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "MixedTraffic",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "MixedTrafficEditor",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
+		}
+	]
+}
