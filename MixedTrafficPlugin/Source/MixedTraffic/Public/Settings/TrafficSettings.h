@@ -6,6 +6,9 @@
 #include "CoreMinimal.h"
 #include "Engine/DeveloperSettings.h"
 #include "Models/MTMTypes.h"
+#if WITH_EDITOR
+#include "PropertyEditorModule.h"
+#endif
 #include "TrafficSettings.generated.h"
 
 UCLASS(Config=MixedTraffic, DefaultConfig, meta=(DisplayName="Mixed Traffic"))
@@ -43,12 +46,16 @@ public:
 	UPROPERTY(Config, EditAnywhere, Category="LOD", meta=(ClampMin="10", ClampMax="500"))
 	float LodFullRadius = 100.0f;
 
-	/** Drop back to background mode beyond this distance (> LodFullRadius) [m] */
-	UPROPERTY(Config, EditAnywhere, Category="LOD", meta=(ClampMin="10", ClampMax="600"))
+	/** Drop back to background mode beyond this distance (should be > LodFullRadius) [m] */
+	UPROPERTY(Config, EditAnywhere, Category="LOD", meta=(ClampMin="10", ClampMax="2000"))
 	float LodBackgroundRadius = 150.0f;
 
 	// UDeveloperSettings interface
 	virtual FName GetCategoryName() const override { return FName(TEXT("Plugins")); }
+
+#if WITH_EDITOR
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
 
 	/** Build FMTMParams with boundary values from project settings */
 	FMTMParams MakeDefaultMTMParams() const;

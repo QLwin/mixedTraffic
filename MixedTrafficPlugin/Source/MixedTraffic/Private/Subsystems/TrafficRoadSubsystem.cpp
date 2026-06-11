@@ -119,9 +119,8 @@ void UTrafficRoadSubsystem::Tick(float DeltaTime)
 void UTrafficRoadSubsystem::UpdateSearchRanges()
 {
 	// Same formula as road.js constructor (dumaxLag / dumaxLead)
-	const float V0Max2 = V0Max;
-	DumaxLead = LMeasure + 1.0f * (V0Max2 * TMeasure + 0.5f * V0Max2 * V0Max2 / BoundaryMeasure);
-	DumaxLag  = LMeasure + 0.5f * (V0Max2 * TMeasure + 0.5f * V0Max2 * V0Max2 / BoundaryMeasure);
+	DumaxLead = LMeasure + 1.0f * (V0Max * TMeasure + 0.5f * V0Max * V0Max / BoundaryMeasure);
+	DumaxLag  = LMeasure + 0.5f * (V0Max * TMeasure + 0.5f * V0Max * V0Max / BoundaryMeasure);
 }
 
 void UTrafficRoadSubsystem::SortVehicles()
@@ -240,9 +239,11 @@ void UTrafficRoadSubsystem::CalcAccelerationsForVehicle(int32 I)
 		AccLat  += AccB.Y;
 	}
 
-	// ── Maximum lateral speed constraint ─────────────────────────────────
-	// Prevent vehicles from drifting at extreme angles to the road axis
-	const float MaxLatSpeed = S.SpeedLong * 0.5f + 0.5f;  // basic heuristic
+	// Maximum lateral speed: simple heuristic based on road-axis angle limit.
+	// Corresponds to dvdumax=0.3 (tan of ~17°) from sim-straight.js line 100.
+	static constexpr float MaxLateralAngleTan    = 0.5f;  // tan(~27°), generous for game use
+	static constexpr float MinLateralSpeedOffset = 0.5f;  // baseline at low long speed [m/s]
+	const float MaxLatSpeed = S.SpeedLong * MaxLateralAngleTan + MinLateralSpeedOffset;
 	if ((AccLat > 0.0f && S.SpeedLat >= MaxLatSpeed) ||
 	    (AccLat < 0.0f && S.SpeedLat <= -MaxLatSpeed))
 	{
@@ -269,7 +270,9 @@ void UTrafficRoadSubsystem::ApplyIntegration(UTrafficVehicleComponent* Veh, floa
 
 	const float CurrentZ = Owner->GetActorLocation().Z;
 	const FVector NewLocation(S.U * 100.0f, S.V * 100.0f, CurrentZ);  // m → cm
-	const float   Yaw       = FMath::RadiansToDegrees(FMath::Atan2(S.SpeedLat, FMath::Max(S.SpeedLong, 0.01f)));
+	// Minimum forward speed used when computing yaw; avoids division by ~zero.
+	static constexpr float MinSpeedForYaw = 0.01f;
+	const float   Yaw       = FMath::RadiansToDegrees(FMath::Atan2(S.SpeedLat, FMath::Max(S.SpeedLong, MinSpeedForYaw)));
 	const FRotator NewRot(0.0f, Yaw, 0.0f);
 
 	Owner->SetActorLocationAndRotation(NewLocation, NewRot, false, nullptr, ETeleportType::TeleportPhysics);

@@ -93,7 +93,7 @@ float FMTMModel::CalcAccLatInt(float X,  float Xl,
 	if (bOverlap)
 	{
 		const float SylbRight = 0.5f * Wroad - Yl - 0.5f * Wl; // leader→right-bd gap
-		const float SylbLeft  = Wroad - SylbRight - Wl;          // leader→left-bd gap
+	const float SylbLeft  = Wroad - SylbRight - Wl;          // leader→left-bd gap
 		const bool bTooNarrowRight = SylbRight < Wveh + MTMParam.S0yLatB;
 		const bool bTooNarrowLeft  = SylbLeft  < Wveh + MTMParam.S0yLatB;
 

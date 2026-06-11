@@ -1,6 +1,5 @@
 // Copyright QLwin. All Rights Reserved.
 #include "Settings/TrafficSettings.h"
-
 UTrafficSettings::UTrafficSettings()
 {
 	// Defaults are set in the header; ini file can override them.
@@ -18,3 +17,16 @@ FMTMParams UTrafficSettings::MakeDefaultMTMParams() const
 	// Lateral interaction defaults (not exposed at project level; use presets)
 	return P;
 }
+
+#if WITH_EDITOR
+void UTrafficSettings::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	// Enforce invariant: background radius must exceed full-LOD radius
+	if (LodBackgroundRadius <= LodFullRadius)
+	{
+		LodBackgroundRadius = LodFullRadius + 50.0f;
+	}
+}
+#endif

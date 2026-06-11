@@ -82,7 +82,9 @@ FORCEINLINE float FIDMModel::CalcAccInt(float S, float V, float Vl, float Al) co
 		V * Params.T + 0.5f * V * DeltaV / FMath::Sqrt(Params.A * Params.B));
 
 	// Gap floor prevents division by zero; 0.1*s0 matches JS original
-	const float SFrac = SStar / FMath::Max(S, 0.1f * Params.S0);
+	// 0.1 * s0 floor prevents division by zero (matches JS original)
+	static constexpr float GapSafetyFactor = 0.1f;
+	const float SFrac = SStar / FMath::Max(S, GapSafetyFactor * Params.S0);
 	return FMath::Max(-Params.BMax, -Params.A * SFrac * SFrac);
 }
 
